@@ -22,12 +22,16 @@ export default function AddForm({ onDone }: Props) {
   const [doi, setDoi] = useState('')
   const [abstract, setAbstract] = useState('')
   const [tags, setTags] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
 
   const reset = () => {
     setType('article')
     setTitle('')
     setAuthors('')
     setYear('')
+    setStartDate('')
+    setEndDate('')
     setJournal('')
     setBookTitle('')
     setPublisher('')
@@ -53,6 +57,8 @@ export default function AddForm({ onDone }: Props) {
           title,
           authors: authors || null,
           year: year ? Number(year) : null,
+          startDate: startDate || null,
+          endDate: endDate || null,
           journal: journal || null,
           bookTitle: bookTitle || null,
           publisher: publisher || null,
@@ -160,6 +166,19 @@ export default function AddForm({ onDone }: Props) {
             <input value={year} onChange={(e) => setYear(e.target.value)}
               className="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm text-neutral-900 outline-none focus:border-black"
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs font-medium text-neutral-700 mb-1">Data de início</label>
+              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
+                className="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm text-neutral-900 outline-none focus:border-black" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-neutral-700 mb-1">Data de fim</label>
+              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
+                className="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm text-neutral-900 outline-none focus:border-black" />
+            </div>
           </div>
 
           {type === 'article' && (

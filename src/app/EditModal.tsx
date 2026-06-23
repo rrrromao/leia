@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useEffect } from 'react'
 
 type Article = {
@@ -17,8 +16,12 @@ type Article = {
   doi: string | null
   abstract: string | null
   tags: string | null
+  notes: string | null
   status: string
   addedAt: string
+  startDate: string | null
+  endDate: string | null
+  finishedAt: string | null
   geminiReview: string | null
 }
 
@@ -46,7 +49,10 @@ export default function EditModal({ item, onClose, onDone }: Props) {
   const [doi, setDoi] = useState(item.doi || '')
   const [abstract, setAbstract] = useState(item.abstract || '')
   const [tags, setTags] = useState(item.tags || '')
+  const [notes, setNotes] = useState(item.notes || '')
   const [status, setStatus] = useState(item.status)
+  const [startDate, setStartDate] = useState(item.startDate ? new Date(item.startDate).toISOString().slice(0, 10) : '')
+  const [endDate, setEndDate] = useState(item.endDate ? new Date(item.endDate).toISOString().slice(0, 10) : '')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,7 +76,10 @@ export default function EditModal({ item, onClose, onDone }: Props) {
           doi: doi || null,
           abstract: abstract || null,
           tags: tags || null,
+          notes: notes || null,
           status,
+          startDate: startDate || null,
+          endDate: endDate || null,
         }),
       })
       if (!res.ok) {
@@ -79,8 +88,9 @@ export default function EditModal({ item, onClose, onDone }: Props) {
       }
       onDone()
       onClose()
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Erro ao atualizar')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao atualizar'
+      setError(message)
     } finally {
       setLoading(false)
     }
@@ -105,8 +115,9 @@ export default function EditModal({ item, onClose, onDone }: Props) {
       if (data.publisher && type === 'book') setPublisher(data.publisher)
       if (data.url) setUrl(data.url)
       if (data.abstract) setAbstract(data.abstract)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Erro ao buscar DOI')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao buscar DOI'
+      setError(message)
     } finally {
       setDoiLoading(false)
     }
@@ -157,6 +168,19 @@ export default function EditModal({ item, onClose, onDone }: Props) {
             <input value={year} onChange={(e) => setYear(e.target.value)}
               className="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm text-neutral-900 outline-none focus:border-black"
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs font-medium text-neutral-700 mb-1">Data de início</label>
+              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
+                className="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm text-neutral-900 outline-none focus:border-black" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-neutral-700 mb-1">Data de fim</label>
+              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
+                className="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm text-neutral-900 outline-none focus:border-black" />
+            </div>
           </div>
 
           {type === 'article' && (

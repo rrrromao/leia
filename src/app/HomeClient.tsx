@@ -19,8 +19,12 @@ type Article = {
   doi: string | null
   abstract: string | null
   tags: string | null
+  notes: string | null
   status: string
   addedAt: string
+  startDate: string | null
+  endDate: string | null
+  finishedAt: string | null
   geminiReview: string | null
 }
 
@@ -118,6 +122,7 @@ export default function HomeClient() {
                         a.publisher,
                         a.edition,
                         a.pages,
+                        a.notes,
                         String(a.year),
                       ]
                         .filter(Boolean)
