@@ -2,16 +2,23 @@
 
 import { useState, useEffect } from 'react'
 import AddForm from './AddForm'
-import StatusForm from './components/StatusForm.client'
+
 
 type Article = {
   id: string
+  type: string
   title: string
   authors: string | null
   year: number | null
   journal: string | null
+  bookTitle: string | null
+  publisher: string | null
+  edition: string | null
+  pages: string | null
   url: string | null
   doi: string | null
+  abstract: string | null
+  tags: string | null
   status: string
   addedAt: string
   geminiReview: string | null
@@ -43,6 +50,20 @@ export default function HomeClient() {
   const done = items.filter((a) => a.status === 'read')
   const list = tab === 'want' ? want : tab === 'reading' ? reading : done
 
+  const label = (status: string) =>
+    status === 'want_to_read'
+      ? 'Quero ler'
+      : status === 'reading'
+        ? 'Lendo'
+        : 'Já li'
+
+  const typeLabel = (type: string) =>
+    type === 'book'
+      ? 'Livro'
+      : type === 'book_chapter'
+        ? 'Capítulo de livro'
+        : 'Artigo'
+
   return (
     <div className="space-y-6">
       <section className="flex items-end justify-between gap-4">
@@ -70,15 +91,15 @@ export default function HomeClient() {
               {t === 'want'
                 ? `Quero ler (${want.length})`
                 : t === 'reading'
-                ? `Lendo (${reading.length})`
-                : `Já li (${done.length})`}
+                  ? `Lendo (${reading.length})`
+                  : `Já li (${done.length})`}
             </button>
           ))}
         </div>
 
         {list.length === 0 ? (
           <div className="p-8 text-center text-sm text-neutral-500">
-            Nenhum artigo nesta lista.
+            Nenhum item nesta lista.
           </div>
         ) : (
           <ul className="divide-y divide-neutral-200">
@@ -88,15 +109,25 @@ export default function HomeClient() {
                   <div className="min-w-0">
                     <h3 className="font-medium text-sm leading-snug text-neutral-900">{a.title}</h3>
                     <p className="text-xs text-neutral-500 mt-0.5">
-                      {[a.authors, a.journal, String(a.year)]
+                      {[
+                        typeLabel(a.type),
+                        a.authors,
+                        a.journal,
+                        a.bookTitle,
+                        a.publisher,
+                        a.edition,
+                        a.pages,
+                        String(a.year),
+                      ]
                         .filter(Boolean)
                         .join(' · ')}
                     </p>
-                    {a.geminiReview && (
+                    {a.abstract && (
                       <p className="text-xs text-neutral-700 mt-2 bg-neutral-50 rounded-lg p-2 border border-neutral-200 leading-relaxed">
-                        {a.geminiReview}
+                        {a.abstract}
                       </p>
                     )}
+                   
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     {a.url && (
@@ -109,7 +140,6 @@ export default function HomeClient() {
                         Abrir
                       </a>
                     )}
-                    <StatusForm id={a.id} current={a.status} />
                   </div>
                 </div>
               </li>
