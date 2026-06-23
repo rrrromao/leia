@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import AddForm from './AddForm'
-
+import EditModal from './EditModal'
 
 type Article = {
   id: string
@@ -28,6 +28,7 @@ export default function HomeClient() {
   const [items, setItems] = useState<Article[]>([])
   const [tab, setTab] = useState<'want' | 'reading' | 'done'>('want')
   const [error, setError] = useState('')
+  const [editing, setEditing] = useState<Article | null>(null)
 
   const load = async () => {
     try {
@@ -127,9 +128,14 @@ export default function HomeClient() {
                         {a.abstract}
                       </p>
                     )}
-                   
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => setEditing(a)}
+                      className="text-xs px-2 py-1 rounded border border-neutral-200 hover:bg-neutral-100 text-neutral-900"
+                    >
+                      Editar
+                    </button>
                     {a.url && (
                       <a
                         href={a.url}
@@ -147,6 +153,8 @@ export default function HomeClient() {
           </ul>
         )}
       </div>
+
+      {editing && <EditModal item={editing} onClose={() => setEditing(null)} onDone={load} />}
     </div>
   )
 }

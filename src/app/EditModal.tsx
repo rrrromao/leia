@@ -1,52 +1,60 @@
 'use client'
-import { useState } from 'react'
 
-type Props = { onDone?: () => void }
+import { useState, useEffect } from 'react'
 
-export default function AddForm({ onDone }: Props) {
-  const [open, setOpen] = useState(false)
+type Article = {
+  id: string
+  type: string
+  title: string
+  authors: string | null
+  year: number | null
+  journal: string | null
+  bookTitle: string | null
+  publisher: string | null
+  edition: string | null
+  pages: string | null
+  url: string | null
+  doi: string | null
+  abstract: string | null
+  tags: string | null
+  status: string
+  addedAt: string
+  geminiReview: string | null
+}
+
+type Props = {
+  item: Article
+  onClose: () => void
+  onDone: () => void
+}
+
+export default function EditModal({ item, onClose, onDone }: Props) {
   const [loading, setLoading] = useState(false)
-  const [doiLoading, setDoiLoading] = useState(false)
   const [error, setError] = useState('')
+  const [doiLoading, setDoiLoading] = useState(false)
 
-  const [type, setType] = useState<'article' | 'book' | 'book_chapter'>('article')
-  const [title, setTitle] = useState('')
-  const [authors, setAuthors] = useState('')
-  const [year, setYear] = useState('')
-  const [journal, setJournal] = useState('')
-  const [bookTitle, setBookTitle] = useState('')
-  const [publisher, setPublisher] = useState('')
-  const [edition, setEdition] = useState('')
-  const [pages, setPages] = useState('')
-  const [url, setUrl] = useState('')
-  const [doi, setDoi] = useState('')
-  const [abstract, setAbstract] = useState('')
-  const [tags, setTags] = useState('')
-
-  const reset = () => {
-    setType('article')
-    setTitle('')
-    setAuthors('')
-    setYear('')
-    setJournal('')
-    setBookTitle('')
-    setPublisher('')
-    setEdition('')
-    setPages('')
-    setUrl('')
-    setDoi('')
-    setAbstract('')
-    setTags('')
-    setError('')
-  }
+  const [type, setType] = useState(item.type || 'article')
+  const [title, setTitle] = useState(item.title)
+  const [authors, setAuthors] = useState(item.authors || '')
+  const [year, setYear] = useState(item.year ? String(item.year) : '')
+  const [journal, setJournal] = useState(item.journal || '')
+  const [bookTitle, setBookTitle] = useState(item.bookTitle || '')
+  const [publisher, setPublisher] = useState(item.publisher || '')
+  const [edition, setEdition] = useState(item.edition || '')
+  const [pages, setPages] = useState(item.pages || '')
+  const [url, setUrl] = useState(item.url || '')
+  const [doi, setDoi] = useState(item.doi || '')
+  const [abstract, setAbstract] = useState(item.abstract || '')
+  const [tags, setTags] = useState(item.tags || '')
+  const [status, setStatus] = useState(item.status)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('/api/articles', {
-        method: 'POST',
+      const res = await fetch(`/api/articles/${item.id}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type,
@@ -62,17 +70,17 @@ export default function AddForm({ onDone }: Props) {
           doi: doi || null,
           abstract: abstract || null,
           tags: tags || null,
+          status,
         }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data?.detail || data?.error || 'Falha ao salvar')
+        throw new Error(data?.detail || data?.error || 'Falha ao atualizar')
       }
-      reset()
-      setOpen(false)
-      onDone?.()
+      onDone()
+      onClose()
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Erro ao salvar')
+      setError(e instanceof Error ? e.message : 'Erro ao atualizar')
     } finally {
       setLoading(false)
     }
@@ -104,29 +112,18 @@ export default function AddForm({ onDone }: Props) {
     }
   }
 
-  if (!open) {
-    return (
-      <button
-        onClick={() => setOpen(true)}
-        className="shrink-0 rounded-xl bg-black text-white text-sm px-4 py-2 hover:opacity-80"
-      >
-        + Adicionar
-      </button>
-    )
-  }
-
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 p-4 pt-24">
       <form onSubmit={handleSubmit} className="w-full max-w-xl rounded-2xl border border-neutral-200 bg-white shadow-lg flex flex-col max-h-[85vh]">
         <div className="flex items-center justify-between p-4 border-b border-neutral-200 shrink-0">
-          <h2 className="text-base font-semibold text-neutral-900">Novo item</h2>
-          <button type="button" onClick={() => { reset(); setOpen(false); }} className="text-sm text-neutral-500 hover:text-neutral-800">
+          <h2 className="text-base font-semibold text-neutral-900">Editar item</h2>
+          <button type="button" onClick={onClose} className="text-sm text-neutral-500 hover:text-neutral-800">
             Fechar
           </button>
         </div>
 
         <div className="overflow-y-auto p-4 space-y-4">
-          {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
+          {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div>
             <label className="block text-xs font-medium text-neutral-700 mb-1">Tipo</label>
@@ -245,10 +242,23 @@ export default function AddForm({ onDone }: Props) {
               className="w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm text-neutral-900 outline-none focus:border-black"
             />
           </div>
+
+          <div>
+            <label className="block text-xs font-medium text-neutral-700 mb-1">Status</label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 outline-none focus:border-black"
+            >
+              <option value="want_to_read">Quero ler</option>
+              <option value="reading">Lendo</option>
+              <option value="read">Já li</option>
+            </select>
+          </div>
         </div>
 
         <div className="p-4 border-t border-neutral-200 flex items-center justify-end gap-3 shrink-0">
-          <button type="button" onClick={() => { reset(); setOpen(false); }} className="text-sm px-4 py-2 rounded-xl border border-neutral-300 text-neutral-900 hover:bg-neutral-50">
+          <button type="button" onClick={onClose} className="text-sm px-4 py-2 rounded-xl border border-neutral-300 text-neutral-900 hover:bg-neutral-50">
             Cancelar
           </button>
           <button type="submit" disabled={loading} className="text-sm px-4 py-2 rounded-xl bg-black text-white hover:opacity-80 disabled:opacity-50">
