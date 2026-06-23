@@ -9,7 +9,7 @@ datasource db {
 
 model Article {
   id           String   @id @default(uuid())
-  type         String   @default("article") // article | book | book_chapter
+  type         String   @default("article")
   title        String
   authors      String?
   year         Int?
@@ -22,7 +22,6 @@ model Article {
   doi          String?
   abstract     String?
   tags         String?
-  notes        String?
   status       String   @default("want_to_read")
   addedAt      DateTime @default(now())
   finishedAt   DateTime?
