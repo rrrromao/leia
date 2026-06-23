@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Article {
+  id           String   @id @default(uuid())
+  title        String
+  authors      String?
+  year         Int?
+  journal      String?
+  url          String?
+  doi          String?
+  abstract     String?
+  tags         String?
+  notes        String?
+  status       String   @default("want_to_read")
+  addedAt      DateTime @default(now())
+  finishedAt   DateTime?
+  geminiReview String?
+}
