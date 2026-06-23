@@ -9,10 +9,15 @@ datasource db {
 
 model Article {
   id           String   @id @default(uuid())
+  type         String   @default("article") // article | book | book_chapter
   title        String
   authors      String?
   year         Int?
   journal      String?
+  bookTitle    String?
+  publisher    String?
+  edition      String?
+  pages        String?
   url          String?
   doi          String?
   abstract     String?

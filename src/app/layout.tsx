@@ -29,14 +29,14 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-gray-50 text-gray-900">
-        <header className="border-b bg-white/70 backdrop-blur sticky top-0 z-10">
+      <body className="min-h-full bg-white text-neutral-900">
+        <header className="border-b border-neutral-200 sticky top-0 z-10 bg-white/80 backdrop-blur">
           <div className="mx-auto max-w-3xl px-4 h-14 flex items-center justify-between">
             <Link href="/" className="font-semibold tracking-tight text-lg">
               📖 LEIA
             </Link>
             <form action={logout}>
-              <button className="text-sm px-3 py-1.5 rounded-lg border hover:bg-gray-50">
+              <button className="text-sm px-3 py-1.5 rounded-lg border border-neutral-900 text-neutral-900 hover:bg-neutral-50">
                 Sair
               </button>
             </form>
